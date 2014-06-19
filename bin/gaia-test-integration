@@ -25,15 +25,15 @@ async.series([
 
 
 function runMarionette() {
-  var cmd = packageRoot + '/node_modules/.bin/marionette-mocha';
+  var cmd = './node_modules/.bin/marionette-mocha';
   var args = [
     projectRoot + '/test/integration/',
-    '--profile-base=' + packageRoot + '/profile.json',
+    '--profile-base=./profile.json',
     '--host=marionette-firefox-host',
     '--ui=tdd',
     '--reporter=spec'
   ];
 
-  spawn(cmd, args, { cwd: projectRoot, stdio: 'inherit' })
+  spawn(cmd, args, { cwd: packageRoot, stdio: 'inherit' })
     .on('close', process.exit);
 }
