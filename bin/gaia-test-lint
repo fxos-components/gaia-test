@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+'use strict';
+
+/**
+ * Dependencies
+ */
+
+var spawn = require('child_process').spawn;
+var normalize = require('path').normalize;
+
+/**
+ * Locals
+ */
+
+var cmd = __dirname + '/../node_modules/.bin/jshint';
+var ignore = normalize(__dirname + '/../template/.jshintignore');
+var config = normalize(__dirname + '/../template/.jshintrc');
+var args = process.argv.slice(2);
+var project = process.cwd();
+
+// `--exclude-path` options doeen't seem to work
+// so hard coding common directories for now
+// args.push('--exclude-path=' + ignore);
+// args.push('--exclude=node_modules');
+// args.push('--exclude=bower_components');
+args.push('--config=' + config);
+
+// Run
+spawn(cmd, args, { cwd: project, stdio: 'inherit' })
+  .on('close', process.exit);

@@ -8,6 +8,7 @@
   "bin": {
     "gaia-test": "./bin/gaia-test",
     "gaia-test-unit": "./bin/gaia-test-unit",
+    "gaia-test-lint": "./bin/gaia-test-lint",
     "gaia-test-integration": "./bin/gaia-test-integration"
   },
   "dependencies": {
