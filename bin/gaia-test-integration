@@ -1,0 +1,39 @@
+#!/usr/bin/env node
+'use strict';
+
+/**
+ * Dependencies
+ */
+
+var downloadFirefox = require('../lib/download-firefox');
+var spawn = require('child_process').spawn;
+var exec = require('child_process').exec;
+var async = require('async');
+
+/**
+ * Locals
+ */
+
+var packageRoot = __dirname + '/..';
+var projectRoot = process.cwd();
+
+// Run
+async.series([
+  downloadFirefox,
+  runMarionette
+]);
+
+
+function runMarionette() {
+  var cmd = packageRoot + '/node_modules/.bin/marionette-mocha';
+  var args = [
+    projectRoot + '/test/integration/',
+    '--profile-base=' + packageRoot + '/profile.json',
+    '--host=marionette-firefox-host',
+    '--ui=tdd',
+    '--reporter=spec'
+  ];
+
+  spawn(cmd, args, { cwd: projectRoot, stdio: 'inherit' })
+    .on('close', process.exit);
+}

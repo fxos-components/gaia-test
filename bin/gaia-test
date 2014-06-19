@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+'use strict';
+
+/**
+ * Dependencies
+ */
+
+var spawn = require('child_process').spawn;
+
+var cwd = process.cwd();
+var types = {
+  'unit': true,
+  'integration': true
+};
+
+var type = process.argv[2];
+var args = process.argv.slice(3);
+
+if (!types[type]) return;
+
+var bin = __dirname + '/gaia-test-' + type;
+
+spawn(bin, args, { cwd: cwd, stdio: 'inherit' })
+  .on('close', process.exit);

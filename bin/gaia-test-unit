@@ -1,0 +1,111 @@
+#!/usr/bin/env node
+'use strict';
+
+/**
+ * Dependencies
+ */
+
+var downloadFirefox = require('../lib/download-firefox');
+var spawn = require('child_process').spawn;
+var exec = require('child_process').exec;
+var read = require('fs').readFileSync;
+var exists = require('fs').existsSync;
+var unlink = require('fs').unlinkSync;
+var write = require('fs').writeFile;
+var async = require('async');
+var path = require('path');
+
+/**
+ * Locals
+ */
+
+var packageRoot = __dirname + '/..';
+var projectRoot = process.cwd();
+var tmpKarmaConf = projectRoot + '/karma.conf.js';
+var devMode = process.argv[2] === '--dev';
+
+// Run
+async.series([
+  downloadFirefox,
+  createKarmaConf,
+  setEnvVar,
+  runKarma
+]);
+
+function createKarmaConf(done) {
+  var userFilepath = projectRoot + '/test/unit/karma.conf.json';
+  var defaults = read(packageRoot + '/karma.conf.json');
+  var user = exists(userFilepath) && read(userFilepath);
+  var prefs = require('../profile.json').prefs;
+
+  if (!user) {
+    console.log('You must create a karma.conf.json at ' + userFilepath);
+    return;
+  }
+
+  var config = mixin(
+    JSON.parse(defaults),
+    JSON.parse(user)
+  );
+
+  // On in the prefs from the profile.json
+  config.customLaunchers.firefox_latest.prefs = prefs;
+
+  // Set the basePath to the project
+  // so that `files` paths are relative
+  // to the project and not the
+  // `karma.conf.js` in this project.
+  // config.basePath = projectRoot;
+
+  // Write tmp
+  write(tmpKarmaConf, templateConfig(config), done);
+
+  function templateConfig(config) {
+    return [
+      'module.exports = function(config) {',
+        'config.set(' + JSON.stringify(config, null, ' ') + ');',
+      '};'
+    ].join('\n');
+  }
+}
+
+function setEnvVar(done) {
+  var cmd = 'find firefox -name "firefox-bin"';
+  exec(cmd, { cwd: packageRoot }, function(err, filepath) {
+
+    // Trim line-breaks
+    filepath = filepath.replace(/(\r\n|\n|\r)/gm, '');
+
+    // Set environment variable
+    process.env['FIREFOX_NIGHTLY_BIN'] = path.normalize(packageRoot + '/' + filepath);
+    console.log('DEBUG:::', JSON.stringify({ s: process.env['FIREFOX_NIGHTLY_BIN']}));
+    done();
+  });
+}
+
+function runKarma(done) {
+  var cmd = packageRoot + '/node_modules/karma/bin/karma';
+  var args = [
+    'start',
+    tmpKarmaConf
+  ];
+
+  // Only perform a single
+  // run unless --dev flag used
+  if (!devMode) args.push('--single-run');
+
+  spawn(cmd, args, { cwd: projectRoot, stdio: 'inherit' })
+    .on('close', function(code) {
+      deleteKarmaConf();
+      process.exit(code);
+    });
+}
+
+function deleteKarmaConf() {
+  unlink(tmpKarmaConf);
+}
+
+function mixin(a, b) {
+  for (var k in b) { a[k] = b[k]; }
+  return a;
+}

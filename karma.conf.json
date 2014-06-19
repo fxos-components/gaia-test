@@ -1,0 +1,17 @@
+
+{
+  "frameworks": ["mocha", "sinon-chai"],
+  "browsers": ["firefox_latest"],
+  "files": [],
+  "proxies": { "/": "http://localhost:9876/base/" },
+  "reporters": ["dots"],
+  "urlRoot": "/karma/",
+  "client": {
+    "mocha": { "ui": "tdd" }
+  },
+  "customLaunchers": {
+    "firefox_latest": {
+      "base": "FirefoxNightly"
+    }
+  }
+}
