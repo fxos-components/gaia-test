@@ -31,7 +31,8 @@ function runMarionette() {
     '--profile-base=./profile.json',
     '--host=marionette-firefox-host',
     '--ui=tdd',
-    '--reporter=spec'
+    '--reporter=spec',
+    '--timeout=6000'
   ];
 
   spawn(cmd, args, { cwd: packageRoot, stdio: 'inherit' })
