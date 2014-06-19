@@ -1,3 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
+var ncp = require('ncp').ncp;
+var src = __dirname + '/../template';
+var dest = process.cwd();
+
+ncp(src, dest);
