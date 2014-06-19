@@ -6,6 +6,7 @@
  */
 
 var downloadFirefox = require('../lib/download-firefox');
+var bowerInstall = require('../lib/bower-install');
 var spawn = require('child_process').spawn;
 var exec = require('child_process').exec;
 var read = require('fs').readFileSync;
@@ -26,6 +27,7 @@ var devMode = process.argv[2] === '--dev';
 
 // Run
 async.series([
+  bowerInstall,
   downloadFirefox,
   createKarmaConf,
   setEnvVar,
