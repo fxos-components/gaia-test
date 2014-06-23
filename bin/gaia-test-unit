@@ -23,7 +23,7 @@ var path = require('path');
 var packageRoot = __dirname + '/..';
 var projectRoot = process.cwd();
 var tmpKarmaConf = projectRoot + '/karma.conf.js';
-var devMode = process.argv[2] === '--dev';
+var devMode = ~process.argv.indexOf('--dev');
 
 // Run
 async.series([
@@ -80,17 +80,16 @@ function setEnvVar(done) {
 
     // Set environment variable
     process.env['FIREFOX_NIGHTLY_BIN'] = path.normalize(packageRoot + '/' + filepath);
-    console.log('DEBUG:::', JSON.stringify({ s: process.env['FIREFOX_NIGHTLY_BIN']}));
     done();
   });
 }
 
 function runKarma(done) {
   var cmd = packageRoot + '/node_modules/karma/bin/karma';
-  var args = [
-    'start',
-    tmpKarmaConf
-  ];
+  var args = process.argv.slice(2);
+
+  args.unshift(tmpKarmaConf);
+  args.unshift('start');
 
   // Only perform a single
   // run unless --dev flag used
