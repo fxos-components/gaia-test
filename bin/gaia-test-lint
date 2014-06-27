@@ -23,6 +23,7 @@ var project = process.cwd();
 // args.push('--exclude-path=' + ignore);
 // args.push('--exclude=node_modules');
 // args.push('--exclude=bower_components');
+args.push('--exclude=dist');
 args.push('--config=' + config);
 
 // Run
